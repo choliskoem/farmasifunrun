@@ -20,10 +20,10 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        $credentials = $request->validate([
-            'email' => [
+        $validated = $request->validate([
+            'login' => [
                 'required',
-                'email',
+                'string',
             ],
 
             'password' => [
@@ -31,6 +31,14 @@ class AuthController extends Controller
             ],
         ]);
 
+        // Sengaja TIDAK divalidasi harus format email -- kolom
+        // `email` di database dipakai juga buat nampung "username"
+        // singkat kayak "super", tanpa perlu ada tanda @.
+        // Tidak ada kolom/tabel baru, cuma cara isinya yang dilonggarkan.
+        $credentials = [
+            'email' => $validated['login'],
+            'password' => $validated['password'],
+        ];
 
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
 
@@ -44,9 +52,9 @@ class AuthController extends Controller
 
         return back()
             ->withErrors([
-                'email' => 'Email atau password tidak sesuai.',
+                'login' => 'Email/Username atau password tidak sesuai.',
             ])
-            ->onlyInput('email');
+            ->onlyInput('login');
     }
 
 

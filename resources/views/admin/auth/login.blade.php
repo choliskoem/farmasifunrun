@@ -126,25 +126,25 @@
                     @csrf
 
 
-                    {{-- Email --}}
+                    {{-- Email / Username --}}
 
                     <div>
 
                         <label
-                            for="email"
+                            for="login"
                             class="mb-2 block text-sm font-bold text-slate-700"
                         >
-                            Email
+                            Email / Username
                         </label>
 
                         <input
-                            id="email"
-                            name="email"
-                            type="email"
-                            value="{{ old('email') }}"
+                            id="login"
+                            name="login"
+                            type="text"
+                            value="{{ old('login') }}"
                             required
                             autofocus
-                            placeholder="admin@himafa.ac.id"
+                            placeholder="admin@himafa.ac.id atau username"
                             class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-500/10"
                         >
 

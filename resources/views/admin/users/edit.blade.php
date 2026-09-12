@@ -48,14 +48,16 @@
             </div>
 
             <div>
-                <label class="mb-2 block text-sm font-semibold text-slate-700">Email</label>
+                <label class="mb-2 block text-sm font-semibold text-slate-700">Email / Login</label>
                 <input
-                    type="email"
+                    type="text"
                     name="email"
                     value="{{ old('email', $user->email) }}"
                     required
+                    placeholder="admin@himafa.test atau cukup teks singkat, mis. super"
                     class="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
                 >
+                <p class="mt-1 text-xs text-slate-500">Boleh format email biasa, atau teks singkat tanpa @ — ini yang dipakai buat login.</p>
             </div>
 
             <div>

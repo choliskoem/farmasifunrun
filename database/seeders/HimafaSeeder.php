@@ -24,15 +24,55 @@ class HimafaSeeder extends Seeder
         |--------------------------------------------------------------------------
         */
 
+        /*
+        |--------------------------------------------------------------------------
+        | AKUN CONTOH -- SUPER ADMIN, ADMIN (SUPERUSER), USER BIASA
+        |--------------------------------------------------------------------------
+        |
+        | 3 akun buat testing tiap level akses:
+        | - Super Admin  -> akses penuh, termasuk Kelola Admin.
+        | - Admin        -> akses panel admin standar.
+        | - User biasa   -> is_admin = false, TIDAK bisa masuk panel
+        |   admin sama sekali (ke-block sama AdminMiddleware).
+        |
+        | Password semuanya "password" -- WAJIB diganti kalau
+        | project ini bakal dipakai beneran (bukan cuma testing).
+        |
+        */
+
         User::updateOrCreate(
             [
-                'email' => 'admin@himafa.test',
+                'email' => 'super',
             ],
             [
                 'name' => 'Administrator HIMAFA',
-                'password' => Hash::make('password'),
+                'password' => Hash::make('super'),
                 'is_admin' => true,
                 'role' => 'super_admin',
+            ]
+        );
+
+        User::updateOrCreate(
+            [
+                'email' => 'superuser',
+            ],
+            [
+                'name' => 'Superuser HIMAFA',
+                'password' => Hash::make('superuser'),
+                'is_admin' => true,
+                'role' => 'admin',
+            ]
+        );
+
+        User::updateOrCreate(
+            [
+                'email' => 'user',
+            ],
+            [
+                'name' => 'User Biasa',
+                'password' => Hash::make('user'),
+                'is_admin' => false,
+                'role' => 'user',
             ]
         );
 

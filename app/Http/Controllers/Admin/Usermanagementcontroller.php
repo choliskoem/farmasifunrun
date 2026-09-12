@@ -31,7 +31,8 @@ class UserManagementController extends Controller
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
 
-            'email' => ['required', 'email', 'max:255', 'unique:users,email'],
+            'email' => ['required', 'string', 'max:255', 'unique:users,email'],
+
 
             'role' => ['required', Rule::in(['admin', 'super_admin'])],
 
@@ -64,7 +65,8 @@ class UserManagementController extends Controller
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
 
-            'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
+            'email' => ['required', 'string', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
+
 
             'role' => ['required', Rule::in(['admin', 'super_admin'])],
 

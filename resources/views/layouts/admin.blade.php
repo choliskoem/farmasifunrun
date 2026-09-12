@@ -341,6 +341,22 @@
                         Social Media
                     </a>
 
+                    @if (auth()->check() && auth()->user()->isSuperAdmin())
+
+                        <a href="{{ route('admin.users.index') }}"
+                            class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition
+                            {{ request()->routeIs('admin.users.*')
+                                ? 'bg-emerald-50 text-emerald-700'
+                                : 'text-slate-600 hover:bg-slate-50 hover:text-emerald-600' }}">
+
+                            <span class="text-lg">🛡️</span>
+
+                            Kelola Admin
+
+                        </a>
+
+                    @endif
+
                 </nav>
 
             </div>
