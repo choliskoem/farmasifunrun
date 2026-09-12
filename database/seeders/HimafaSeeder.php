@@ -30,13 +30,24 @@ class HimafaSeeder extends Seeder
         |--------------------------------------------------------------------------
         |
         | 3 akun buat testing tiap level akses:
-        | - Super Admin  -> akses penuh, termasuk Kelola Admin.
-        | - Admin        -> akses panel admin standar.
-        | - User biasa   -> is_admin = false, TIDAK bisa masuk panel
-        |   admin sama sekali (ke-block sama AdminMiddleware).
+        | - Super Admin  -> akses penuh ke semua menu + Kelola Admin
+        |   + Atur Akses Menu.
+        | - Admin        -> akses menu yang dicentang buat role
+        |   'admin' lewat halaman "Atur Akses Menu".
+        | - User biasa   -> akses menu yang dicentang buat role
+        |   'user' (biasanya lebih sedikit dari Admin).
         |
-        | Password semuanya "password" -- WAJIB diganti kalau
-        | project ini bakal dipakai beneran (bukan cuma testing).
+        | PENTING: ketiganya is_admin = true (bukan false), karena
+        | is_admin cuma gerbang "boleh masuk panel admin atau
+        | nggak" -- pembatasan menu yang SEBENARNYA diatur lewat
+        | role + tabel role_menu_permissions (halaman "Atur Akses
+        | Menu"), bukan lewat is_admin. Kalau is_admin dibikin
+        | false, akun itu ke-block total oleh AdminMiddleware
+        | sebelum sempat dicek menu-nya sama sekali.
+        |
+        | Password semuanya sama dengan nama akunnya -- WAJIB
+        | diganti kalau project ini bakal dipakai beneran (bukan
+        | cuma testing).
         |
         */
 
@@ -71,7 +82,7 @@ class HimafaSeeder extends Seeder
             [
                 'name' => 'User Biasa',
                 'password' => Hash::make('user'),
-                'is_admin' => false,
+                'is_admin' => true,
                 'role' => 'user',
             ]
         );
