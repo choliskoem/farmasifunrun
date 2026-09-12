@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\DepartmentController;
 use App\Http\Controllers\Admin\GalleryController;
 use App\Http\Controllers\Admin\EventController;
 use App\Http\Controllers\Admin\SocialLinkController;
+use App\Http\Controllers\Admin\UserManagementController;
 
 use App\Http\Controllers\HomeController;
 
@@ -220,6 +221,29 @@ Route::prefix('admin')
 
         /*
         |--------------------------------------------------------------------------
+        | KELOLA ADMIN (KHUSUS SUPER ADMIN)
+        |--------------------------------------------------------------------------
+        |
+        | Ditumpuk middleware 'super_admin' di atas middleware 'admin'
+        | yang sudah ada di grup ini -- jadi tetap wajib login +
+        | is_admin dulu, BARU dicek lagi apakah role-nya super_admin.
+        |
+        */
+
+        Route::middleware(['super_admin'])->group(function () {
+
+            Route::resource(
+                'users',
+                UserManagementController::class
+            )->except([
+                'show'
+            ]);
+
+        });
+
+
+        /*
+        |--------------------------------------------------------------------------
         | FUN RUN ADMIN
         |--------------------------------------------------------------------------
         |
@@ -420,7 +444,7 @@ Route::prefix('admin')
 
         /*
         |--------------------------------------------------------------------------
-        | REGISTRASI MANUAL (JALUR UNDANGAN / BACKDOOR)
+        | REGISTRASI MANUAL (JALUR UNDANGAN / SPESIAL)
         |--------------------------------------------------------------------------
         |
         | URL:

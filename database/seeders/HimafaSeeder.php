@@ -32,6 +32,7 @@ class HimafaSeeder extends Seeder
                 'name' => 'Administrator HIMAFA',
                 'password' => Hash::make('password'),
                 'is_admin' => true,
+                'role' => 'super_admin',
             ]
         );
 

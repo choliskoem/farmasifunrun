@@ -22,6 +22,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'is_admin',
+        'role',
     ];
 
     /**
@@ -41,6 +43,7 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'is_admin' => 'boolean',
     ];
 
 
@@ -58,5 +61,21 @@ public function verifiedFunRunPayments(): HasMany
         FunRunPayment::class,
         'verified_by'
     );
+}
+
+/**
+ * Super Admin -> akses penuh, termasuk kelola akun admin lain.
+ * Admin biasa -> akses panel admin standar (default kalau kolom
+ * role kosong/belum diisi, supaya akun lama yang belum sempat
+ * di-migrasi datanya tetap bisa masuk seperti biasa).
+ */
+public function isSuperAdmin(): bool
+{
+    return $this->role === 'super_admin';
+}
+
+public function isAdminRole(): bool
+{
+    return in_array($this->role, ['admin', 'super_admin']);
 }
 }
