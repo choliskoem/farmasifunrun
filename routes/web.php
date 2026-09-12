@@ -14,6 +14,7 @@ use App\Http\Controllers\Admin\GalleryController;
 use App\Http\Controllers\Admin\EventController;
 use App\Http\Controllers\Admin\SocialLinkController;
 use App\Http\Controllers\Admin\UserManagementController;
+use App\Http\Controllers\Admin\MenuPermissionController;
 
 use App\Http\Controllers\HomeController;
 
@@ -93,15 +94,19 @@ Route::prefix('admin')
         |--------------------------------------------------------------------------
         */
 
-        Route::get('/profil', [
-            ProfileController::class,
-            'edit'
-        ])->name('profile.edit');
+        Route::middleware(['menu:profile'])->group(function () {
 
-        Route::put('/profil', [
-            ProfileController::class,
-            'update'
-        ])->name('profile.update');
+            Route::get('/profil', [
+                ProfileController::class,
+                'edit'
+            ])->name('profile.edit');
+
+            Route::put('/profil', [
+                ProfileController::class,
+                'update'
+            ])->name('profile.update');
+
+        });
 
 
         /*
@@ -110,15 +115,19 @@ Route::prefix('admin')
         |--------------------------------------------------------------------------
         */
 
-        Route::get('/visi', [
-            VisionController::class,
-            'edit'
-        ])->name('vision.edit');
+        Route::middleware(['menu:vision'])->group(function () {
 
-        Route::put('/visi', [
-            VisionController::class,
-            'update'
-        ])->name('vision.update');
+            Route::get('/visi', [
+                VisionController::class,
+                'edit'
+            ])->name('vision.edit');
+
+            Route::put('/visi', [
+                VisionController::class,
+                'update'
+            ])->name('vision.update');
+
+        });
 
 
         /*
@@ -132,7 +141,7 @@ Route::prefix('admin')
             MissionController::class
         )->except([
             'show'
-        ]);
+        ])->middleware('menu:missions');
 
 
         /*
@@ -146,7 +155,7 @@ Route::prefix('admin')
             ManagementPeriodController::class
         )->except([
             'show'
-        ]);
+        ])->middleware('menu:management-periods');
 
 
         /*
@@ -160,7 +169,7 @@ Route::prefix('admin')
             ManagementMemberController::class
         )->except([
             'show'
-        ]);
+        ])->middleware('menu:management-members');
 
 
         /*
@@ -174,7 +183,7 @@ Route::prefix('admin')
             DepartmentController::class
         )->except([
             'show'
-        ]);
+        ])->middleware('menu:departments');
 
 
         /*
@@ -188,7 +197,7 @@ Route::prefix('admin')
             GalleryController::class
         )->except([
             'show'
-        ]);
+        ])->middleware('menu:galleries');
 
 
         /*
@@ -202,7 +211,7 @@ Route::prefix('admin')
             EventController::class
         )->except([
             'show'
-        ]);
+        ])->middleware('menu:events');
 
 
         /*
@@ -216,7 +225,7 @@ Route::prefix('admin')
             SocialLinkController::class
         )->except([
             'show'
-        ]);
+        ])->middleware('menu:social-links');
 
 
         /*
@@ -239,6 +248,16 @@ Route::prefix('admin')
                 'show'
             ]);
 
+            Route::get(
+                '/menu-permissions',
+                [MenuPermissionController::class, 'edit']
+            )->name('menu-permissions.edit');
+
+            Route::put(
+                '/menu-permissions',
+                [MenuPermissionController::class, 'update']
+            )->name('menu-permissions.update');
+
         });
 
 
@@ -257,6 +276,7 @@ Route::prefix('admin')
 
         Route::prefix('fun-run')
             ->name('fun-run.')
+            ->middleware('menu:fun-run-registrations')
             ->group(function () {
 
                 /*
@@ -365,6 +385,7 @@ Route::prefix('admin')
 
         Route::prefix('fun-run/settings')
             ->name('fun-run.settings.')
+            ->middleware('menu:fun-run-settings')
             ->group(function () {
 
                 Route::get(
@@ -457,6 +478,7 @@ Route::prefix('admin')
 
         Route::prefix('fun-run/manual')
             ->name('fun-run.manual.')
+            ->middleware('menu:fun-run-manual')
             ->group(function () {
 
                 Route::get(

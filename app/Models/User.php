@@ -78,4 +78,25 @@ public function isAdminRole(): bool
 {
     return in_array($this->role, ['admin', 'super_admin']);
 }
+
+/**
+ * Cek apakah user ini boleh buka menu tertentu.
+ *
+ * - Super Admin selalu true buat SEMUA menu (hardcode, bukan
+ *   data), biar nggak pernah kekunci dari menunya sendiri.
+ * - Role lain (admin/user) dicek ke tabel role_menu_permissions.
+ *   Kalau belum pernah diatur sama sekali (baris kosong), DEFAULT-nya
+ *   ditolak (aman by default) -- Super Admin wajib nyalain manual
+ *   lewat halaman "Atur Akses Menu".
+ */
+public function canAccessMenu(string $menuKey): bool
+{
+    if ($this->isSuperAdmin()) {
+        return true;
+    }
+
+    return \App\Models\RoleMenuPermission::where('role', $this->role)
+        ->where('menu_key', $menuKey)
+        ->exists();
+}
 }

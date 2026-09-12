@@ -103,118 +103,130 @@
 
                 <nav class="space-y-1">
 
-                    @php
-                        // Dihitung langsung di layout supaya konsisten
-                        // di semua halaman admin (tidak tergantung
-                        // controller mana yang me-render halaman).
-                        $pendingPublicCount = \App\Models\FunRunRegistration::where(
-                            'status',
-                            'waiting_verification',
-                        )->where('channel', 'public')->count();
+                    @if (auth()->user()->canAccessMenu('fun-run-registrations'))
 
-                        $pendingInvitationCount = \App\Models\FunRunRegistration::where(
-                            'status',
-                            'waiting_verification',
-                        )->where('channel', 'invitation')->count();
+                        @php
+                            // Dihitung langsung di layout supaya konsisten
+                            // di semua halaman admin (tidak tergantung
+                            // controller mana yang me-render halaman).
+                            $pendingPublicCount = \App\Models\FunRunRegistration::where(
+                                'status',
+                                'waiting_verification',
+                            )->where('channel', 'public')->count();
 
-                        $pendingBackdoorCount = \App\Models\FunRunRegistration::where(
-                            'status',
-                            'waiting_verification',
-                        )->where('channel', 'backdoor')->count();
-                    @endphp
+                            $pendingInvitationCount = \App\Models\FunRunRegistration::where(
+                                'status',
+                                'waiting_verification',
+                            )->where('channel', 'invitation')->count();
 
-                    {{-- Peserta Fun Run — Umum --}}
-                    <a href="{{ route('admin.fun-run.registrations', ['channel' => 'public']) }}"
-                        class="flex items-center justify-between rounded-xl px-4 py-3 text-sm font-semibold transition
-                        {{ request()->routeIs('admin.fun-run.registrations*') && request('channel', 'public') === 'public'
-                            ? 'bg-emerald-50 text-emerald-700'
-                            : 'text-slate-600 hover:bg-slate-50 hover:text-emerald-600' }}">
+                            $pendingBackdoorCount = \App\Models\FunRunRegistration::where(
+                                'status',
+                                'waiting_verification',
+                            )->where('channel', 'backdoor')->count();
+                        @endphp
 
-                        <span class="flex items-center gap-3">
-                            <span class="text-lg">🌐</span>
-                            Peserta — Umum
-                        </span>
+                        {{-- Peserta Fun Run — Umum --}}
+                        <a href="{{ route('admin.fun-run.registrations', ['channel' => 'public']) }}"
+                            class="flex items-center justify-between rounded-xl px-4 py-3 text-sm font-semibold transition
+                            {{ request()->routeIs('admin.fun-run.registrations*') && request('channel', 'public') === 'public'
+                                ? 'bg-emerald-50 text-emerald-700'
+                                : 'text-slate-600 hover:bg-slate-50 hover:text-emerald-600' }}">
 
-                        @if ($pendingPublicCount > 0)
-                            <span
-                                class="flex h-6 min-w-6 items-center justify-center rounded-full bg-red-500 px-2 text-[11px] font-black text-white">
-                                {{ $pendingPublicCount }}
+                            <span class="flex items-center gap-3">
+                                <span class="text-lg">🌐</span>
+                                Peserta — Umum
                             </span>
-                        @endif
 
-                    </a>
+                            @if ($pendingPublicCount > 0)
+                                <span
+                                    class="flex h-6 min-w-6 items-center justify-center rounded-full bg-red-500 px-2 text-[11px] font-black text-white">
+                                    {{ $pendingPublicCount }}
+                                </span>
+                            @endif
+
+                        </a>
 
 
-                    {{-- Peserta Fun Run — Jalur Undangan --}}
-                    <a href="{{ route('admin.fun-run.registrations', ['channel' => 'invitation']) }}"
-                        class="flex items-center justify-between rounded-xl px-4 py-3 text-sm font-semibold transition
-                        {{ request()->routeIs('admin.fun-run.registrations*') && request('channel') === 'invitation'
-                            ? 'bg-emerald-50 text-emerald-700'
-                            : 'text-slate-600 hover:bg-slate-50 hover:text-emerald-600' }}">
+                        {{-- Peserta Fun Run — Jalur Undangan --}}
+                        <a href="{{ route('admin.fun-run.registrations', ['channel' => 'invitation']) }}"
+                            class="flex items-center justify-between rounded-xl px-4 py-3 text-sm font-semibold transition
+                            {{ request()->routeIs('admin.fun-run.registrations*') && request('channel') === 'invitation'
+                                ? 'bg-emerald-50 text-emerald-700'
+                                : 'text-slate-600 hover:bg-slate-50 hover:text-emerald-600' }}">
 
-                        <span class="flex items-center gap-3">
-                            <span class="text-lg">🎟️</span>
-                            Peserta — Undangan
-                        </span>
-
-                        @if ($pendingInvitationCount > 0)
-                            <span
-                                class="flex h-6 min-w-6 items-center justify-center rounded-full bg-red-500 px-2 text-[11px] font-black text-white">
-                                {{ $pendingInvitationCount }}
+                            <span class="flex items-center gap-3">
+                                <span class="text-lg">🎟️</span>
+                                Peserta — Undangan
                             </span>
-                        @endif
 
-                    </a>
+                            @if ($pendingInvitationCount > 0)
+                                <span
+                                    class="flex h-6 min-w-6 items-center justify-center rounded-full bg-red-500 px-2 text-[11px] font-black text-white">
+                                    {{ $pendingInvitationCount }}
+                                </span>
+                            @endif
+
+                        </a>
 
 
-                    {{-- Peserta Fun Run — Jalur Backdoor --}}
-                    <a href="{{ route('admin.fun-run.registrations', ['channel' => 'backdoor']) }}"
-                        class="flex items-center justify-between rounded-xl px-4 py-3 text-sm font-semibold transition
-                        {{ request()->routeIs('admin.fun-run.registrations*') && request('channel') === 'backdoor'
-                            ? 'bg-emerald-50 text-emerald-700'
-                            : 'text-slate-600 hover:bg-slate-50 hover:text-emerald-600' }}">
+                        {{-- Peserta Fun Run — Jalur Backdoor --}}
+                        <a href="{{ route('admin.fun-run.registrations', ['channel' => 'backdoor']) }}"
+                            class="flex items-center justify-between rounded-xl px-4 py-3 text-sm font-semibold transition
+                            {{ request()->routeIs('admin.fun-run.registrations*') && request('channel') === 'backdoor'
+                                ? 'bg-emerald-50 text-emerald-700'
+                                : 'text-slate-600 hover:bg-slate-50 hover:text-emerald-600' }}">
 
-                        <span class="flex items-center gap-3">
-                            <span class="text-lg">🔑</span>
-                            Peserta — Spesial
-                        </span>
-
-                        @if ($pendingBackdoorCount > 0)
-                            <span
-                                class="flex h-6 min-w-6 items-center justify-center rounded-full bg-red-500 px-2 text-[11px] font-black text-white">
-                                {{ $pendingBackdoorCount }}
+                            <span class="flex items-center gap-3">
+                                <span class="text-lg">🔑</span>
+                                Peserta — Spesial
                             </span>
-                        @endif
 
-                    </a>
+                            @if ($pendingBackdoorCount > 0)
+                                <span
+                                    class="flex h-6 min-w-6 items-center justify-center rounded-full bg-red-500 px-2 text-[11px] font-black text-white">
+                                    {{ $pendingBackdoorCount }}
+                                </span>
+                            @endif
 
+                        </a>
 
-                    {{-- Pengaturan Fun Run (Periode & Stok Tiket) --}}
-                    <a href="{{ route('admin.fun-run.settings.index') }}"
-                        class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition
-                        {{ request()->routeIs('admin.fun-run.settings.*')
-                            ? 'bg-emerald-50 text-emerald-700'
-                            : 'text-slate-600 hover:bg-slate-50 hover:text-emerald-600' }}">
-
-                        <span class="text-lg">⚙️</span>
-
-                        Pengaturan Fun Run
-
-                    </a>
+                    @endif
 
 
-                    {{-- Registrasi Manual --}}
-                    <a href="{{ route('admin.fun-run.manual.create') }}"
-                        class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition
-                        {{ request()->routeIs('admin.fun-run.manual.*')
-                            ? 'bg-emerald-50 text-emerald-700'
-                            : 'text-slate-600 hover:bg-slate-50 hover:text-emerald-600' }}">
+                    @if (auth()->user()->canAccessMenu('fun-run-settings'))
 
-                        <span class="text-lg">📝</span>
+                        {{-- Pengaturan Fun Run (Periode & Stok Tiket) --}}
+                        <a href="{{ route('admin.fun-run.settings.index') }}"
+                            class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition
+                            {{ request()->routeIs('admin.fun-run.settings.*')
+                                ? 'bg-emerald-50 text-emerald-700'
+                                : 'text-slate-600 hover:bg-slate-50 hover:text-emerald-600' }}">
 
-                        Registrasi Manual
+                            <span class="text-lg">⚙️</span>
 
-                    </a>
+                            Pengaturan Fun Run
+
+                        </a>
+
+                    @endif
+
+
+                    @if (auth()->user()->canAccessMenu('fun-run-manual'))
+
+                        {{-- Registrasi Manual --}}
+                        <a href="{{ route('admin.fun-run.manual.create') }}"
+                            class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition
+                            {{ request()->routeIs('admin.fun-run.manual.*')
+                                ? 'bg-emerald-50 text-emerald-700'
+                                : 'text-slate-600 hover:bg-slate-50 hover:text-emerald-600' }}">
+
+                            <span class="text-lg">📝</span>
+
+                            Registrasi Manual
+
+                        </a>
+
+                    @endif
 
                 </nav>
 
@@ -225,121 +237,157 @@
 
                 <nav class="space-y-1">
 
-                    {{-- Profil --}}
-                    <a href="{{ route('admin.profile.edit') }}"
-                        class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition
-                        {{ request()->routeIs('admin.profile.*')
-                            ? 'bg-emerald-50 text-emerald-700'
-                            : 'text-slate-600 hover:bg-slate-50 hover:text-emerald-600' }}">
+                    @if (auth()->user()->canAccessMenu('profile'))
 
-                        <span class="text-lg">📖</span>
+                        {{-- Profil --}}
+                        <a href="{{ route('admin.profile.edit') }}"
+                            class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition
+                            {{ request()->routeIs('admin.profile.*')
+                                ? 'bg-emerald-50 text-emerald-700'
+                                : 'text-slate-600 hover:bg-slate-50 hover:text-emerald-600' }}">
 
-                        Profil HIMAFA
-                    </a>
+                            <span class="text-lg">📖</span>
 
+                            Profil HIMAFA
+                        </a>
 
-                    {{-- Visi --}}
-                    <a href="{{ route('admin.vision.edit') }}"
-                        class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition
-                        {{ request()->routeIs('admin.vision.*')
-                            ? 'bg-emerald-50 text-emerald-700'
-                            : 'text-slate-600 hover:bg-slate-50 hover:text-emerald-600' }}">
-
-                        <span class="text-lg">🎯</span>
-
-                        Visi
-                    </a>
+                    @endif
 
 
-                    {{-- Misi --}}
-                    <a href="{{ route('admin.missions.index') }}"
-                        class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition
-                        {{ request()->routeIs('admin.missions.*')
-                            ? 'bg-emerald-50 text-emerald-700'
-                            : 'text-slate-600 hover:bg-slate-50 hover:text-emerald-600' }}">
+                    @if (auth()->user()->canAccessMenu('vision'))
 
-                        <span class="text-lg">🚀</span>
+                        {{-- Visi --}}
+                        <a href="{{ route('admin.vision.edit') }}"
+                            class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition
+                            {{ request()->routeIs('admin.vision.*')
+                                ? 'bg-emerald-50 text-emerald-700'
+                                : 'text-slate-600 hover:bg-slate-50 hover:text-emerald-600' }}">
 
-                        Misi
-                    </a>
+                            <span class="text-lg">🎯</span>
 
+                            Visi
+                        </a>
 
-                    {{-- Periode --}}
-                    <a href="{{ route('admin.management-periods.index') }}"
-                        class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition
-                        {{ request()->routeIs('admin.management-periods.*')
-                            ? 'bg-emerald-50 text-emerald-700'
-                            : 'text-slate-600 hover:bg-slate-50 hover:text-emerald-600' }}">
-
-                        <span class="text-lg">📅</span>
-
-                        Periode Kepengurusan
-                    </a>
+                    @endif
 
 
-                    {{-- Pengurus --}}
-                    <a href="{{ route('admin.management-members.index') }}"
-                        class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition
-                        {{ request()->routeIs('admin.management-members.*')
-                            ? 'bg-emerald-50 text-emerald-700'
-                            : 'text-slate-600 hover:bg-slate-50 hover:text-emerald-600' }}">
+                    @if (auth()->user()->canAccessMenu('missions'))
 
-                        <span class="text-lg">👥</span>
+                        {{-- Misi --}}
+                        <a href="{{ route('admin.missions.index') }}"
+                            class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition
+                            {{ request()->routeIs('admin.missions.*')
+                                ? 'bg-emerald-50 text-emerald-700'
+                                : 'text-slate-600 hover:bg-slate-50 hover:text-emerald-600' }}">
 
-                        Pengurus
-                    </a>
+                            <span class="text-lg">🚀</span>
 
+                            Misi
+                        </a>
 
-                    {{-- Bidang --}}
-                    <a href="{{ route('admin.departments.index') }}"
-                        class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition
-                        {{ request()->routeIs('admin.departments.*')
-                            ? 'bg-emerald-50 text-emerald-700'
-                            : 'text-slate-600 hover:bg-slate-50 hover:text-emerald-600' }}">
-
-                        <span class="text-lg">🏢</span>
-
-                        Bidang
-                    </a>
+                    @endif
 
 
-                    {{-- Galeri --}}
-                    <a href="{{ route('admin.galleries.index') }}"
-                        class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition
-                        {{ request()->routeIs('admin.galleries.*')
-                            ? 'bg-emerald-50 text-emerald-700'
-                            : 'text-slate-600 hover:bg-slate-50 hover:text-emerald-600' }}">
+                    @if (auth()->user()->canAccessMenu('management-periods'))
 
-                        <span class="text-lg">🖼️</span>
+                        {{-- Periode --}}
+                        <a href="{{ route('admin.management-periods.index') }}"
+                            class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition
+                            {{ request()->routeIs('admin.management-periods.*')
+                                ? 'bg-emerald-50 text-emerald-700'
+                                : 'text-slate-600 hover:bg-slate-50 hover:text-emerald-600' }}">
 
-                        Galeri
-                    </a>
+                            <span class="text-lg">📅</span>
 
+                            Periode Kepengurusan
+                        </a>
 
-                    {{-- Event --}}
-                    <a href="{{ route('admin.events.index') }}"
-                        class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition
-                        {{ request()->routeIs('admin.events.*')
-                            ? 'bg-emerald-50 text-emerald-700'
-                            : 'text-slate-600 hover:bg-slate-50 hover:text-emerald-600' }}">
-
-                        <span class="text-lg">🎫</span>
-
-                        Event
-                    </a>
+                    @endif
 
 
-                    {{-- Social --}}
-                    <a href="{{ route('admin.social-links.index') }}"
-                        class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition
-                        {{ request()->routeIs('admin.social-links.*')
-                            ? 'bg-emerald-50 text-emerald-700'
-                            : 'text-slate-600 hover:bg-slate-50 hover:text-emerald-600' }}">
+                    @if (auth()->user()->canAccessMenu('management-members'))
 
-                        <span class="text-lg">🔗</span>
+                        {{-- Pengurus --}}
+                        <a href="{{ route('admin.management-members.index') }}"
+                            class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition
+                            {{ request()->routeIs('admin.management-members.*')
+                                ? 'bg-emerald-50 text-emerald-700'
+                                : 'text-slate-600 hover:bg-slate-50 hover:text-emerald-600' }}">
 
-                        Social Media
-                    </a>
+                            <span class="text-lg">👥</span>
+
+                            Pengurus
+                        </a>
+
+                    @endif
+
+
+                    @if (auth()->user()->canAccessMenu('departments'))
+
+                        {{-- Bidang --}}
+                        <a href="{{ route('admin.departments.index') }}"
+                            class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition
+                            {{ request()->routeIs('admin.departments.*')
+                                ? 'bg-emerald-50 text-emerald-700'
+                                : 'text-slate-600 hover:bg-slate-50 hover:text-emerald-600' }}">
+
+                            <span class="text-lg">🏢</span>
+
+                            Bidang
+                        </a>
+
+                    @endif
+
+
+                    @if (auth()->user()->canAccessMenu('galleries'))
+
+                        {{-- Galeri --}}
+                        <a href="{{ route('admin.galleries.index') }}"
+                            class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition
+                            {{ request()->routeIs('admin.galleries.*')
+                                ? 'bg-emerald-50 text-emerald-700'
+                                : 'text-slate-600 hover:bg-slate-50 hover:text-emerald-600' }}">
+
+                            <span class="text-lg">🖼️</span>
+
+                            Galeri
+                        </a>
+
+                    @endif
+
+
+                    @if (auth()->user()->canAccessMenu('events'))
+
+                        {{-- Event --}}
+                        <a href="{{ route('admin.events.index') }}"
+                            class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition
+                            {{ request()->routeIs('admin.events.*')
+                                ? 'bg-emerald-50 text-emerald-700'
+                                : 'text-slate-600 hover:bg-slate-50 hover:text-emerald-600' }}">
+
+                            <span class="text-lg">🎫</span>
+
+                            Event
+                        </a>
+
+                    @endif
+
+
+                    @if (auth()->user()->canAccessMenu('social-links'))
+
+                        {{-- Social --}}
+                        <a href="{{ route('admin.social-links.index') }}"
+                            class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition
+                            {{ request()->routeIs('admin.social-links.*')
+                                ? 'bg-emerald-50 text-emerald-700'
+                                : 'text-slate-600 hover:bg-slate-50 hover:text-emerald-600' }}">
+
+                            <span class="text-lg">🔗</span>
+
+                            Social Media
+                        </a>
+
+                    @endif
 
                     @if (auth()->check() && auth()->user()->isSuperAdmin())
 
@@ -352,6 +400,18 @@
                             <span class="text-lg">🛡️</span>
 
                             Kelola Admin
+
+                        </a>
+
+                        <a href="{{ route('admin.menu-permissions.edit') }}"
+                            class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition
+                            {{ request()->routeIs('admin.menu-permissions.*')
+                                ? 'bg-emerald-50 text-emerald-700'
+                                : 'text-slate-600 hover:bg-slate-50 hover:text-emerald-600' }}">
+
+                            <span class="text-lg">🔐</span>
+
+                            Atur Akses Menu
 
                         </a>
 
