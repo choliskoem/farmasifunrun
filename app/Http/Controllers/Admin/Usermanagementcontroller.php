@@ -36,7 +36,7 @@ class UserManagementController extends Controller
 
             'role' => ['required', Rule::in(['admin', 'super_admin'])],
 
-            'password' => ['required', Password::min(3)],
+            'password' => ['required', Password::min(4)],
         ]);
 
         User::create([
@@ -70,7 +70,7 @@ class UserManagementController extends Controller
 
             'role' => ['required', Rule::in(['admin', 'super_admin'])],
 
-            'password' => ['nullable', Password::min(3)],
+            'password' => ['nullable', Password::min(4)],
         ]);
 
         // Jangan sampai Super Admin terakhir nurunin role dirinya
