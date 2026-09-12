@@ -53,25 +53,39 @@
                     Tipe Event
                 </label>
 
-                <div class="grid gap-3 sm:grid-cols-2">
+                @php
+                    $defaultTipe = auth()->user()->isSuperAdmin() ? 'full' : 'flyer';
+                @endphp
 
-                    <label class="cursor-pointer">
+                <div class="grid gap-3 {{ auth()->user()->isSuperAdmin() ? 'sm:grid-cols-2' : '' }}">
 
-                        <input
-                            type="radio"
-                            name="tipe"
-                            value="full"
-                            id="tipe-full"
-                            class="peer sr-only"
-                            {{ old('tipe', 'full') === 'full' ? 'checked' : '' }}
-                        >
+                    @if (auth()->user()->isSuperAdmin())
 
-                        <div class="rounded-xl border border-slate-300 p-4 transition peer-checked:border-emerald-500 peer-checked:bg-emerald-50">
-                            <p class="font-bold text-slate-800">Full Event</p>
-                            <p class="mt-1 text-xs text-slate-500">Judul, deskripsi, tanggal, dan link ditampilkan lengkap.</p>
-                        </div>
+                        <label class="cursor-pointer">
 
-                    </label>
+                            <input
+                                type="radio"
+                                name="tipe"
+                                value="full"
+                                id="tipe-full"
+                                class="peer sr-only"
+                                {{ old('tipe', $defaultTipe) === 'full' ? 'checked' : '' }}
+                            >
+
+                            <div class="rounded-xl border border-slate-300 p-4 transition peer-checked:border-emerald-500 peer-checked:bg-emerald-50">
+                                <p class="font-bold text-slate-800">Full Event</p>
+                                <p class="mt-1 text-xs text-slate-500">Judul, deskripsi, tanggal, dan link ditampilkan lengkap.</p>
+                            </div>
+
+                        </label>
+
+                    @else
+
+                        {{-- Radio tersembunyi -- cuma Super Admin
+                        yang boleh bikin tipe Full Event. --}}
+                        <input type="radio" name="tipe" value="full" id="tipe-full" class="hidden">
+
+                    @endif
 
                     <label class="cursor-pointer">
 
@@ -81,7 +95,7 @@
                             value="flyer"
                             id="tipe-flyer"
                             class="peer sr-only"
-                            {{ old('tipe') === 'flyer' ? 'checked' : '' }}
+                            {{ old('tipe', $defaultTipe) === 'flyer' ? 'checked' : '' }}
                         >
 
                         <div class="rounded-xl border border-slate-300 p-4 transition peer-checked:border-emerald-500 peer-checked:bg-emerald-50">
@@ -92,6 +106,12 @@
                     </label>
 
                 </div>
+
+                @if (!auth()->user()->isSuperAdmin())
+                    <p class="mt-2 text-xs text-slate-500">
+                        Tipe "Full Event" cuma bisa dibuat oleh Super Admin.
+                    </p>
+                @endif
 
             </div>
 
@@ -262,8 +282,8 @@
 
     }
 
-    tipeFull.addEventListener('change', toggleTipe);
-    tipeFlyer.addEventListener('change', toggleTipe);
+    tipeFull?.addEventListener('change', toggleTipe);
+    tipeFlyer?.addEventListener('change', toggleTipe);
 
     toggleTipe();
 </script>

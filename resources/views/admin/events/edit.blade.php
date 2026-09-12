@@ -45,45 +45,78 @@
                         Tipe Event
                     </label>
 
-                    <div class="grid gap-3 sm:grid-cols-2">
+                    @if (auth()->user()->isSuperAdmin())
 
-                        <label class="cursor-pointer">
+                        <div class="grid gap-3 sm:grid-cols-2">
 
-                            <input
-                                type="radio"
-                                name="tipe"
-                                value="full"
-                                id="tipe-full"
-                                class="peer sr-only"
-                                {{ old('tipe', $event->tipe ?? 'full') === 'full' ? 'checked' : '' }}
-                            >
+                            <label class="cursor-pointer">
 
-                            <div class="rounded-xl border border-slate-300 p-4 transition peer-checked:border-emerald-500 peer-checked:bg-emerald-50">
-                                <p class="font-bold text-slate-800">Full Event</p>
-                                <p class="mt-1 text-xs text-slate-500">Judul, deskripsi, tanggal, dan link ditampilkan lengkap.</p>
-                            </div>
+                                <input
+                                    type="radio"
+                                    name="tipe"
+                                    value="full"
+                                    id="tipe-full"
+                                    class="peer sr-only"
+                                    {{ old('tipe', $event->tipe ?? 'full') === 'full' ? 'checked' : '' }}
+                                >
 
-                        </label>
+                                <div class="rounded-xl border border-slate-300 p-4 transition peer-checked:border-emerald-500 peer-checked:bg-emerald-50">
+                                    <p class="font-bold text-slate-800">Full Event</p>
+                                    <p class="mt-1 text-xs text-slate-500">Judul, deskripsi, tanggal, dan link ditampilkan lengkap.</p>
+                                </div>
 
-                        <label class="cursor-pointer">
+                            </label>
 
-                            <input
-                                type="radio"
-                                name="tipe"
-                                value="flyer"
-                                id="tipe-flyer"
-                                class="peer sr-only"
-                                {{ old('tipe', $event->tipe ?? '') === 'flyer' ? 'checked' : '' }}
-                            >
+                            <label class="cursor-pointer">
 
-                            <div class="rounded-xl border border-slate-300 p-4 transition peer-checked:border-emerald-500 peer-checked:bg-emerald-50">
-                                <p class="font-bold text-slate-800">Hanya Flyer</p>
-                                <p class="mt-1 text-xs text-slate-500">Cuma gambar poster yang tampil, tanpa detail teks.</p>
-                            </div>
+                                <input
+                                    type="radio"
+                                    name="tipe"
+                                    value="flyer"
+                                    id="tipe-flyer"
+                                    class="peer sr-only"
+                                    {{ old('tipe', $event->tipe ?? '') === 'flyer' ? 'checked' : '' }}
+                                >
 
-                        </label>
+                                <div class="rounded-xl border border-slate-300 p-4 transition peer-checked:border-emerald-500 peer-checked:bg-emerald-50">
+                                    <p class="font-bold text-slate-800">Hanya Flyer</p>
+                                    <p class="mt-1 text-xs text-slate-500">Cuma gambar poster yang tampil, tanpa detail teks.</p>
+                                </div>
 
-                    </div>
+                            </label>
+
+                        </div>
+
+                    @elseif ($event->tipe === 'full')
+
+                        {{-- Event ini sudah tipe Full Event (dibuat Super
+                        Admin). Dikunci -- admin biasa/user cuma bisa lihat,
+                        nggak bisa ubah ke Flyer atau sebaliknya. --}}
+                        <input type="hidden" name="tipe" value="full">
+
+                        <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                            <p class="font-bold text-slate-800">Full Event</p>
+                            <p class="mt-1 text-xs text-slate-500">
+                                Tipe event ini cuma bisa diubah oleh Super Admin.
+                            </p>
+                        </div>
+
+                    @else
+
+                        {{-- Belum pernah jadi Full Event -- tetap nggak
+                        boleh diubah ke situ selain oleh Super Admin. --}}
+                        <input type="hidden" name="tipe" value="flyer">
+
+                        <div class="rounded-xl border border-slate-300 bg-emerald-50 p-4">
+                            <p class="font-bold text-slate-800">Hanya Flyer</p>
+                            <p class="mt-1 text-xs text-slate-500">Cuma gambar poster yang tampil, tanpa detail teks.</p>
+                        </div>
+
+                        <p class="mt-2 text-xs text-slate-500">
+                            Tipe "Full Event" cuma bisa dibuat oleh Super Admin.
+                        </p>
+
+                    @endif
 
                 </div>
 
@@ -223,20 +256,27 @@
 
     function toggleTipe() {
 
-        if (tipeFlyer.checked) {
+        // Kalau tipeFlyer nggak ada (non-Super Admin, event sudah
+        // Full Event), berarti tipenya PASTI 'full' -- baca dari
+        // hidden input sebagai gantinya.
+        const isFlyer = tipeFlyer
+            ? tipeFlyer.checked
+            : document.querySelector('input[name="tipe"]')?.value === 'flyer';
+
+        if (isFlyer) {
             fullOnlyFields.classList.add('hidden');
-            gambarRequiredMark.classList.remove('hidden');
-            gambarFlyerHint.classList.remove('hidden');
+            gambarRequiredMark?.classList.remove('hidden');
+            gambarFlyerHint?.classList.remove('hidden');
         } else {
             fullOnlyFields.classList.remove('hidden');
-            gambarRequiredMark.classList.add('hidden');
-            gambarFlyerHint.classList.add('hidden');
+            gambarRequiredMark?.classList.add('hidden');
+            gambarFlyerHint?.classList.add('hidden');
         }
 
     }
 
-    tipeFull.addEventListener('change', toggleTipe);
-    tipeFlyer.addEventListener('change', toggleTipe);
+    tipeFull?.addEventListener('change', toggleTipe);
+    tipeFlyer?.addEventListener('change', toggleTipe);
 
     toggleTipe();
 </script>

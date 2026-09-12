@@ -44,6 +44,12 @@ class EventController extends Controller
             'status' => 'required|in:draft,aktif,selesai',
         ]);
 
+        // Cuma Super Admin yang boleh bikin tipe "full" -- jaga-jaga
+        // ada yang coba kirim request manual buat bypass tampilan.
+        if ($validated['tipe'] === 'full' && !auth()->user()->isSuperAdmin()) {
+            $validated['tipe'] = 'flyer';
+        }
+
         if ($request->hasFile('gambar')) {
             $validated['gambar'] =
                 $request->file('gambar')->store(
@@ -89,6 +95,14 @@ class EventController extends Controller
             ],
             'status' => 'required|in:draft,aktif,selesai',
         ]);
+
+        // Non-Super Admin nggak boleh ubah tipe sama sekali --
+        // kalau event ini sudah "full" (dibuat Super Admin
+        // sebelumnya), pertahankan; kalau belum, paksa tetap "flyer"
+        // walau ada yang coba kirim request manual.
+        if (!auth()->user()->isSuperAdmin()) {
+            $validated['tipe'] = $event->tipe === 'full' ? 'full' : 'flyer';
+        }
 
         if ($request->hasFile('gambar')) {
 
