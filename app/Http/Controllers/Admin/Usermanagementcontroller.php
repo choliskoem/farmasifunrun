@@ -70,7 +70,7 @@ class UserManagementController extends Controller
 
             'role' => ['required', Rule::in(['admin', 'super_admin'])],
 
-            'password' => ['nullable', Password::min(8)],
+            'password' => ['nullable', Password::min(3)],
         ]);
 
         // Jangan sampai Super Admin terakhir nurunin role dirinya
