@@ -35,10 +35,12 @@
             <div class="flex items-center gap-3">
 
                 @if ($registration->status === 'paid')
-
                     <a href="{{ route('fun-run.ticket.download', $registration->registration_code) }}"
                         class="inline-flex items-center gap-2 rounded-full bg-slate-900 px-4 py-2 text-sm font-bold text-white transition hover:bg-emerald-600">
-                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3"/></svg>
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3" />
+                        </svg>
                         Download Tiket
                     </a>
 
@@ -639,32 +641,6 @@ BUKTI TRANSFER
                                 class="mt-3 inline-flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-emerald-600">
                                 ↗ Buka Bukti Transfer
                             </a>
-
-
-                            {{-- DEBUG / INFORMASI FILE --}}
-
-                            <div class="mt-3 rounded-xl bg-slate-50 p-3 text-xs text-slate-500">
-
-                                <div>
-                                    <span class="font-bold">
-                                        File:
-                                    </span>
-
-                                    {{ $payment->proof }}
-
-                                </div>
-
-                                <div class="mt-1 break-all">
-
-                                    <span class="font-bold">
-                                        URL:
-                                    </span>
-
-                                    {{ $proofUrl }}
-
-                                </div>
-
-                            </div>
                         @else
                             <div
                                 class="flex min-h-[300px] items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-slate-50">
@@ -755,9 +731,7 @@ BUKTI TRANSFER
 
                 </div>
 
-                <form
-                    action="{{ route('admin.fun-run.registrations.verify-email', $registration) }}"
-                    method="POST"
+                <form action="{{ route('admin.fun-run.registrations.verify-email', $registration) }}" method="POST"
                     onsubmit="return confirm(
         'Kirim ulang link pembayaran baru ke email peserta? Link lama akan tidak berlaku lagi.'
     )">
@@ -793,8 +767,10 @@ BUKTI TRANSFER
                     </p>
 
                     @if ($registration->channel && $registration->channel !== 'public')
-                        <span class="mt-3 inline-flex items-center gap-1.5 rounded-full bg-amber-200 px-3 py-1 text-xs font-bold text-amber-900">
-                            Didaftarkan manual — {{ $registration->channel === 'backdoor' ? 'Jalur Spesial' : ucfirst($registration->channel) }}
+                        <span
+                            class="mt-3 inline-flex items-center gap-1.5 rounded-full bg-amber-200 px-3 py-1 text-xs font-bold text-amber-900">
+                            Didaftarkan manual —
+                            {{ $registration->channel === 'backdoor' ? 'Jalur Spesial' : ucfirst($registration->channel) }}
                         </span>
                     @endif
 
@@ -806,9 +782,7 @@ BUKTI TRANSFER
 
                     {{-- VERIFIKASI PEMBAYARAN --}}
 
-                    <form
-                        action="{{ route('admin.fun-run.registrations.verify', $registration) }}"
-                        method="POST"
+                    <form action="{{ route('admin.fun-run.registrations.verify', $registration) }}" method="POST"
                         onsubmit="return confirm(
         'Verifikasi pembayaran ini? Kode registrasi akan diaktifkan dan email konfirmasi akan dikirim ke peserta. Jangan sebarluaskan kode registrasi peserta.'
     )">
