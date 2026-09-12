@@ -36,7 +36,7 @@ class UserManagementController extends Controller
 
             'role' => ['required', Rule::in(['admin', 'super_admin'])],
 
-            'password' => ['required', Password::min(8)],
+            'password' => ['required', Password::min(3)],
         ]);
 
         User::create([

@@ -8,8 +8,11 @@
     $tabs = [
         'public' => ['label' => 'Umum', 'icon' => '🌐'],
         'invitation' => ['label' => 'Jalur Undangan', 'icon' => '🎟️'],
-        'backdoor' => ['label' => 'Jalur Spesial', 'icon' => '🔑'],
     ];
+
+    if (auth()->user()->role !== 'user') {
+        $tabs['backdoor'] = ['label' => 'Jalur Spesial', 'icon' => '🔑'];
+    }
 @endphp
 
 <div class="space-y-6">
