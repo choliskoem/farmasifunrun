@@ -89,7 +89,7 @@
                 <input
                     type="password"
                     name="password"
-                    minlength="8"
+                    minlength="3"
                     placeholder="Kosongkan kalau tidak mau ganti password"
                     class="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
                 >

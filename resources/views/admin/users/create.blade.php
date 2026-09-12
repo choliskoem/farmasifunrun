@@ -92,7 +92,7 @@
                     minlength="3"
                     class="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
                 >
-                <p class="mt-1 text-xs text-slate-500">Minimal 8 karakter.</p>
+                <p class="mt-1 text-xs text-slate-500">Minimal 3 karakter.</p>
             </div>
 
             <div class="flex justify-end gap-3">
