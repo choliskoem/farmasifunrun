@@ -219,6 +219,20 @@ class FunRunManualRegistrationController extends Controller
             ],
         ]);
 
+        // Role 'user' cuma boleh pakai Jalur Undangan (gratis). Jalur
+        // Spesial (harga custom) disembunyikan di tampilan, tapi
+        // dicek juga di sini jaga-jaga ada yang coba kirim request
+        // manual buat bypass tampilan.
+        if (auth()->user()->role === 'user' && $validated['channel'] === 'backdoor') {
+
+            return back()
+                ->withInput()
+                ->with(
+                    'error',
+                    'Anda tidak punya akses ke Jalur Spesial.'
+                );
+        }
+
         $event = FunRunEvent::where('is_active', true)
             ->latest()
             ->firstOrFail();

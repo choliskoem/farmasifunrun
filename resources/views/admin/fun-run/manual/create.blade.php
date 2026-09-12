@@ -48,7 +48,7 @@
                     Jalur Pendaftaran
                 </label>
 
-                <div class="grid gap-4 sm:grid-cols-2">
+                <div class="grid gap-4 {{ auth()->user()->role === 'user' ? '' : 'sm:grid-cols-2' }}">
 
                     <label class="cursor-pointer">
 
@@ -79,34 +79,45 @@
 
                     </label>
 
-                    <label class="cursor-pointer">
+                    @if (auth()->user()->role !== 'user')
 
-                        <input
-                            type="radio"
-                            name="channel"
-                            value="backdoor"
-                            class="peer sr-only"
-                            id="channel-backdoor"
-                            {{ old('channel') === 'backdoor' ? 'checked' : '' }}
-                        >
+                        <label class="cursor-pointer">
 
-                        <div
-                            class="h-full rounded-2xl border-2 border-slate-200 p-4 transition
-                                   hover:border-slate-300
-                                   peer-checked:border-emerald-500
-                                   peer-checked:bg-emerald-50
-                                   peer-checked:ring-2
-                                   peer-checked:ring-emerald-500/20"
-                        >
-                            <p class="font-bold text-slate-900">
-                                Jalur Spesial
-                            </p>
-                            <p class="mt-1 text-sm text-slate-500">
-                                Harga diinput manual oleh admin.
-                            </p>
-                        </div>
+                            <input
+                                type="radio"
+                                name="channel"
+                                value="backdoor"
+                                class="peer sr-only"
+                                id="channel-backdoor"
+                                {{ old('channel') === 'backdoor' ? 'checked' : '' }}
+                            >
 
-                    </label>
+                            <div
+                                class="h-full rounded-2xl border-2 border-slate-200 p-4 transition
+                                       hover:border-slate-300
+                                       peer-checked:border-emerald-500
+                                       peer-checked:bg-emerald-50
+                                       peer-checked:ring-2
+                                       peer-checked:ring-emerald-500/20"
+                            >
+                                <p class="font-bold text-slate-900">
+                                    Jalur Spesial
+                                </p>
+                                <p class="mt-1 text-sm text-slate-500">
+                                    Harga diinput manual oleh admin.
+                                </p>
+                            </div>
+
+                        </label>
+
+                    @else
+
+                        {{-- Radio tersembunyi biar JS toggle & form
+                        submit tetap konsisten walau opsi Backdoor
+                        nggak ditampilkan buat role user. --}}
+                        <input type="radio" name="channel" value="backdoor" id="channel-backdoor" class="hidden">
+
+                    @endif
 
                 </div>
 
