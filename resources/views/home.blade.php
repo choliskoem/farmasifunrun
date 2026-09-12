@@ -879,21 +879,33 @@
                 <div class="mt-12 grid grid-cols-2 gap-4 md:grid-cols-4">
 
                     @forelse($galleries as $index => $gallery)
-                        <button type="button" data-gallery="{{ asset('storage/' . $gallery->foto) }}"
-                            class="reveal group relative overflow-hidden rounded-3xl bg-slate-100 text-left
+
+                        @php
+                            $photos = $gallery->photos;
+                            $firstPhoto = $photos->first();
+                        @endphp
+
+                        <button type="button"
+                            data-gallery="{{ asset('storage/' . $firstPhoto->foto) }}"
+                            data-interval="3500"
+                            class="gallery-slider reveal group relative overflow-hidden rounded-3xl bg-slate-100 text-left
                     {{ $index === 0 ? 'col-span-2 row-span-2 aspect-square' : 'aspect-square' }}">
 
-                            <img src="{{ asset('storage/' . $gallery->foto) }}" alt="{{ $gallery->judul }}"
-                                class="h-full w-full object-cover transition duration-700 group-hover:scale-110">
+                            @foreach ($photos as $slideIndex => $photo)
+                                <img src="{{ asset('storage/' . $photo->foto) }}" alt="{{ $gallery->judul }}"
+                                    data-slide-src="{{ asset('storage/' . $photo->foto) }}"
+                                    class="gallery-slide absolute inset-0 h-full w-full object-cover transition duration-1000 group-hover:scale-105
+                            {{ $slideIndex === 0 ? 'opacity-100' : 'opacity-0' }}">
+                            @endforeach
 
 
                             <div
-                                class="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent opacity-0 transition group-hover:opacity-100">
+                                class="pointer-events-none absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent opacity-0 transition group-hover:opacity-100">
                             </div>
 
 
                             <div
-                                class="absolute bottom-0 left-0 right-0 translate-y-3 p-5 text-white opacity-0 transition duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+                                class="pointer-events-none absolute bottom-0 left-0 right-0 translate-y-3 p-5 text-white opacity-0 transition duration-300 group-hover:translate-y-0 group-hover:opacity-100">
 
                                 <div class="text-sm font-bold">
                                     {{ $gallery->judul }}
@@ -906,6 +918,17 @@
                                 @endif
 
                             </div>
+
+
+                            @if ($photos->count() > 1)
+                                <div class="pointer-events-none absolute bottom-3 left-1/2 z-10 flex -translate-x-1/2 gap-1.5">
+                                    @foreach ($photos as $slideIndex => $photo)
+                                        <span
+                                            class="gallery-dot h-1.5 w-1.5 rounded-full transition
+                                    {{ $slideIndex === 0 ? 'bg-white' : 'bg-white/50' }}"></span>
+                                    @endforeach
+                                </div>
+                            @endif
 
                         </button>
 
@@ -1580,6 +1603,65 @@ EVENT
                     });
 
                 }
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | GALLERY AUTO-SLIDE
+                |--------------------------------------------------------------------------
+                */
+
+                function setActiveGallerySlide(slider, slides, dots, index) {
+
+                    slides.forEach(function(slide, i) {
+                        slide.classList.toggle('opacity-100', i === index);
+                        slide.classList.toggle('opacity-0', i !== index);
+                    });
+
+                    dots.forEach(function(dot, i) {
+                        dot.classList.toggle('bg-white', i === index);
+                        dot.classList.toggle('bg-white/50', i !== index);
+                    });
+
+                    slider.dataset.gallery = slides[index].dataset.slideSrc;
+
+                }
+
+
+                document.querySelectorAll('.gallery-slider')
+                    .forEach(function(slider) {
+
+                        const slides = Array.from(
+                            slider.querySelectorAll('.gallery-slide')
+                        );
+
+                        const dots = Array.from(
+                            slider.querySelectorAll('.gallery-dot')
+                        );
+
+                        if (slides.length <= 1) {
+                            return;
+                        }
+
+                        const interval =
+                            parseInt(slider.dataset.interval || '3500', 10);
+
+                        let current = 0;
+
+                        setInterval(function() {
+
+                            current = (current + 1) % slides.length;
+
+                            setActiveGallerySlide(
+                                slider,
+                                slides,
+                                dots,
+                                current
+                            );
+
+                        }, interval);
+
+                    });
 
 
                 /*
