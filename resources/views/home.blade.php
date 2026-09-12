@@ -1518,20 +1518,18 @@ EVENT
                 |--------------------------------------------------------------------------
                 | MOBILE MENU
                 |--------------------------------------------------------------------------
+                |
+                | Toggle klik tombolnya SENGAJA tidak didaftarkan di
+                | sini -- itu sudah ditangani oleh resources/js/app.js
+                | (bundle Vite). Kalau didaftarkan lagi di sini, jadi
+                | DOBEL: dua listener classList.toggle('hidden') pada
+                | klik yang sama saling membatalkan (nyala-mati
+                | langsung di klik yang sama), jadi kelihatan kayak
+                | tombolnya "nggak ngapa-ngapain".
                 */
-
-                const mobileButton =
-                    document.getElementById('mobile-menu-button');
 
                 const mobileMenu =
                     document.getElementById('mobile-menu');
-
-                mobileButton?.addEventListener('click', function() {
-
-                    mobileMenu.classList.toggle('hidden');
-
-                });
-
 
                 document.querySelectorAll('#mobile-menu a')
                     .forEach(function(link) {
