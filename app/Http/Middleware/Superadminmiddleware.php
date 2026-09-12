@@ -20,7 +20,7 @@ class SuperAdminMiddleware
     ): Response {
 
         if (!auth()->check() || !auth()->user()->isSuperAdmin()) {
-            abort(403, 'Halaman ini cuma bisa diakses oleh Super Admin.');
+            abort(403, 'Halaman ini cuma bisa diakses oleh Super Admin');
         }
 
         return $next($request);
