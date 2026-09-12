@@ -169,26 +169,30 @@
                         </a>
 
 
-                        {{-- Peserta Fun Run — Jalur Backdoor --}}
-                        <a href="{{ route('admin.fun-run.registrations', ['channel' => 'backdoor']) }}"
-                            class="flex items-center justify-between rounded-xl px-4 py-3 text-sm font-semibold transition
-                            {{ request()->routeIs('admin.fun-run.registrations*') && request('channel') === 'backdoor'
-                                ? 'bg-emerald-50 text-emerald-700'
-                                : 'text-slate-600 hover:bg-slate-50 hover:text-emerald-600' }}">
+                        @if (auth()->user()->role !== 'user')
 
-                            <span class="flex items-center gap-3">
-                                <span class="text-lg">🔑</span>
-                                Peserta — Spesial
-                            </span>
+                            {{-- Peserta Fun Run — Jalur Backdoor --}}
+                            <a href="{{ route('admin.fun-run.registrations', ['channel' => 'backdoor']) }}"
+                                class="flex items-center justify-between rounded-xl px-4 py-3 text-sm font-semibold transition
+                                {{ request()->routeIs('admin.fun-run.registrations*') && request('channel') === 'backdoor'
+                                    ? 'bg-emerald-50 text-emerald-700'
+                                    : 'text-slate-600 hover:bg-slate-50 hover:text-emerald-600' }}">
 
-                            @if ($pendingBackdoorCount > 0)
-                                <span
-                                    class="flex h-6 min-w-6 items-center justify-center rounded-full bg-red-500 px-2 text-[11px] font-black text-white">
-                                    {{ $pendingBackdoorCount }}
+                                <span class="flex items-center gap-3">
+                                    <span class="text-lg">🔑</span>
+                                    Peserta — Spesial
                                 </span>
-                            @endif
 
-                        </a>
+                                @if ($pendingBackdoorCount > 0)
+                                    <span
+                                        class="flex h-6 min-w-6 items-center justify-center rounded-full bg-red-500 px-2 text-[11px] font-black text-white">
+                                        {{ $pendingBackdoorCount }}
+                                    </span>
+                                @endif
+
+                            </a>
+
+                        @endif
 
                     @endif
 
