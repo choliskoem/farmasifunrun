@@ -34,7 +34,13 @@
 
         @php
             $roleLabels = ['admin' => 'Admin', 'user' => 'User'];
-            $groupedMenus = collect($menus)->groupBy('group');
+            // PENTING: parameter kedua "true" WAJIB ada -- ini yang
+            // bikin key asli menu ('profile', 'vision', dst) tetap
+            // dipertahankan. Kalau dihapus, Laravel otomatis ganti
+            // key-nya jadi angka urut (0, 1, 2, ...) dan checkbox-nya
+            // jadi kekirim value yang salah (value="0" bukan
+            // value="profile"), sehingga nggak pernah kesimpen.
+            $groupedMenus = collect($menus)->groupBy('group', true);
         @endphp
 
         <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
@@ -94,7 +100,7 @@
             type="submit"
             class="rounded-lg bg-emerald-600 px-6 py-3 text-sm font-bold text-white transition hover:bg-emerald-700"
         >
-            Simpan Akses Menu
+            Simpan Akses Menu.
         </button>
 
     </form>
