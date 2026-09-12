@@ -948,236 +948,166 @@ class FunRunController extends Controller
      * verifikasi keaslian tiket.
      */
     /**
-     * Path folder tempat file font .ttf disimpan. Taruh file-file
-     * font (Anton-Regular.ttf, Poppins-*.ttf) di
-     * resources/fonts/ pada project Laravel Anda.
+     * Gambar kartu tiket sebagai PNG pakai GD, termasuk QR code
+     * verifikasi keaslian tiket.
      */
-    private function fontPath(string $filename): string
-    {
-        return resource_path('fonts/' . $filename);
-    }
-
-    /**
-     * Lebar & tinggi teks kalau digambar pakai font TTF tertentu --
-     * dipakai buat menengahkan teks atau mengecilkan ukuran font
-     * otomatis kalau teksnya kepanjangan.
-     */
-    private function ttfMeasure(float $size, string $fontPath, string $text): array
-    {
-        $box = imagettfbbox($size, 0, $fontPath, $text);
-
-        return [
-            'width' => abs($box[4] - $box[0]),
-            'height' => abs($box[5] - $box[1]),
-        ];
-    }
-
-    /**
-     * Cari ukuran font TTF terbesar yang muat dalam $maxWidth,
-     * dimulai dari $startSize lalu diperkecil sedikit demi sedikit.
-     */
-    private function ttfFitSize(float $startSize, float $minSize, string $fontPath, string $text, float $maxWidth): float
-    {
-        $size = $startSize;
-
-        while ($size > $minSize) {
-
-            if ($this->ttfMeasure($size, $fontPath, $text)['width'] <= $maxWidth) {
-                break;
-            }
-
-            $size -= 1;
-        }
-
-        return $size;
-    }
-
-    /**
-     * Gambar teks TTF dengan efek bayangan tipis di belakangnya,
-     * supaya tetap kebaca jelas walau latarnya gradasi warna-warni.
-     */
-    private function ttfTextWithShadow($image, float $size, int $x, int $y, string $fontPath, string $text, int $color, int $shadowColor, int $offset = 2): void
-    {
-        imagettftext($image, $size, 0, $x + $offset, $y + $offset, $shadowColor, $fontPath, $text);
-        imagettftext($image, $size, 0, $x, $y, $color, $fontPath, $text);
-    }
-
     private function renderTicketImage(FunRunRegistration $registration): string
     {
-        $width = 1200;
-        $height = 560;
-        $stripWidth = 150;
+        $width = 1100;
+        $height = 520;
+        $sidebarWidth = 360;
 
         $image = imagecreatetruecolor($width, $height);
-        imageantialias($image, true);
 
-        $anton = $this->fontPath('Anton-Regular.ttf');
-        $popExtraBold = $this->fontPath('Poppins-ExtraBold.ttf');
-        $popBold = $this->fontPath('Poppins-Bold.ttf');
-        $popSemiBold = $this->fontPath('Poppins-SemiBold.ttf');
-        $popRegular = $this->fontPath('Poppins-Regular.ttf');
-
+        // Palet warna (samakan dengan tema Race Day di web).
+        $bg = imagecolorallocate($image, 11, 17, 32);        // #0B1120
+        $darkGreen = imagecolorallocate($image, 4, 32, 24);  // teks di atas hijau
         $white = imagecolorallocate($image, 255, 255, 255);
-        $black = imagecolorallocate($image, 20, 10, 20);
-        $shadow = imagecolorallocate($image, 40, 0, 40);
-        $lime = imagecolorallocate($image, 163, 230, 53);
-        $skyBlue = imagecolorallocate($image, 125, 211, 252);
-        $creamBg = imagecolorallocate($image, 237, 238, 224);
-        $pinkStrip = imagecolorallocate($image, 232, 140, 205);
+        $gray = imagecolorallocate($image, 148, 163, 184);
+        $lightGray = imagecolorallocate($image, 203, 213, 225);
+        $line = imagecolorallocate($image, 30, 41, 59);
+        $amber = imagecolorallocate($image, 245, 158, 11);
 
-        imagefill($image, 0, 0, $creamBg);
+        imagefill($image, 0, 0, $bg);
 
         /*
         |--------------------------------------------------------------------------
-        | STRIP KIRI -- PINK + BARCODE DEKORATIF + KODE VERTIKAL
+        | SISI KIRI -- SIDEBAR GRADASI HIJAU + BIB NUMBER
         |--------------------------------------------------------------------------
         */
 
-        imagefilledrectangle($image, 0, 0, $stripWidth, $height, $pinkStrip);
+        $topColor = [52, 211, 153];    // emerald muda
+        $bottomColor = [4, 120, 87];   // emerald tua
 
-        // Kode registrasi dibaca vertikal (dari bawah ke atas), dekat tepi kiri.
-        $codeSize = 15;
-        imagettftext($image, $codeSize, 90, 34, $height - 60, $black, $popSemiBold, $registration->registration_code);
+        for ($y = 0; $y < $height; $y++) {
 
-        // Barcode dekoratif (bukan barcode asli yang bisa discan --
-        // untuk verifikasi keaslian tiket, pakai QR code di sisi kanan).
-        mt_srand(crc32($registration->registration_code));
+            $ratio = $y / $height;
 
-        $barX = 45;
-        $barEnd = $stripWidth - 12;
-        $barTop = 55;
-        $barBottom = $height - 55;
+            $r = (int) ($topColor[0] + ($bottomColor[0] - $topColor[0]) * $ratio);
+            $g = (int) ($topColor[1] + ($bottomColor[1] - $topColor[1]) * $ratio);
+            $b = (int) ($topColor[2] + ($bottomColor[2] - $topColor[2]) * $ratio);
 
-        while ($barX < $barEnd) {
-
-            $barW = mt_rand(1, 5);
-
-            if (mt_rand(0, 9) > 0) {
-                imagefilledrectangle($image, $barX, $barTop, min($barX + $barW - 1, $barEnd), $barBottom, $black);
-            }
-
-            $barX += $barW + mt_rand(1, 3);
+            imageline($image, 0, $y, $sidebarWidth, $y, imagecolorallocate($image, $r, $g, $b));
         }
 
-        mt_srand();
+        $darkGreenRgb = [4, 32, 24];
+        $whiteRgb = [255, 255, 255];
 
-        /*
-        |--------------------------------------------------------------------------
-        | AREA UTAMA -- GRADASI UNGU KE ORANYE
-        |--------------------------------------------------------------------------
-        */
-
-        $gradStart = [107, 33, 130];  // ungu
-        $gradEnd = [234, 88, 12];     // oranye
-
-        for ($x = $stripWidth; $x < $width; $x++) {
-
-            $ratio = ($x - $stripWidth) / ($width - $stripWidth);
-
-            $r = (int) ($gradStart[0] + ($gradEnd[0] - $gradStart[0]) * $ratio);
-            $g = (int) ($gradStart[1] + ($gradEnd[1] - $gradStart[1]) * $ratio);
-            $b = (int) ($gradStart[2] + ($gradEnd[2] - $gradStart[2]) * $ratio);
-
-            imageline($image, $x, 0, $x, $height, imagecolorallocate($image, $r, $g, $b));
-        }
-
-        $contentX = $stripWidth + 50;
-        $maxContentWidth = $width - $contentX - 260;
-
-        // Tag kecil nama event.
-        imagettftext($image, 15, 0, $contentX, 55, $white, $popSemiBold, strtoupper($registration->event->name));
-
-        // Headline besar "FARMASI" / "FUN RUN".
-        imagettftext($image, 34, 0, $contentX, 105, $white, $anton, 'FARMASI');
-
-        $runSize = $this->ttfFitSize(92, 55, $anton, 'FUN RUN', $maxContentWidth);
-        $this->ttfTextWithShadow($image, $runSize, $contentX, 205, $anton, 'FUN RUN', $white, $shadow, 3);
-
-        /*
-        |--------------------------------------------------------------------------
-        | BADGE KATEGORI (LINGKARAN) + NAMA PESERTA
-        |--------------------------------------------------------------------------
-        */
-
-        $circleY = 260;
-        $circleR = 66;
-        $circleCx = $contentX + $circleR;
-
-        imageellipse($image, $circleCx, $circleY, $circleR * 2, $circleR * 2, $white);
-        imageellipse($image, $circleCx, $circleY, $circleR * 2 - 3, $circleR * 2 - 3, $white);
-
-        $catText = $registration->category->name;
-        $catMeasure = $this->ttfMeasure(28, $popExtraBold, $catText);
-        imagettftext(
-            $image, 28, 0,
-            (int) ($circleCx - $catMeasure['width'] / 2),
-            (int) ($circleY + $catMeasure['height'] / 2),
-            $white, $popExtraBold, $catText
+        // "BIB NUMBER" label, diperbesar dikit biar nggak kalah sama nomornya.
+        $this->drawScaledText(
+            $image, 3, 36, 30, 'BIB NUMBER', $darkGreenRgb,
+            $this->gradientColorAt(30, $height, $topColor, $bottomColor), 1.4
         );
 
-        $nameX = $contentX + ($circleR * 2) + 30;
-        $nameSize = $this->ttfFitSize(30, 16, $popExtraBold, strtoupper($registration->name), $maxContentWidth - ($circleR * 2) - 30);
-        $this->ttfTextWithShadow($image, $nameSize, $nameX, $circleY - 5, $popExtraBold, strtoupper($registration->name), $white, $shadow, 2);
+        // Nomor bib, dispasi lebar (tracked) + diperbesar biar jelas
+        // dibaca -- skalanya dihitung otomatis biar nggak pernah
+        // kepanjangan sampai nabrak garis perforasi, apapun panjang
+        // kode registrasinya.
+        $bibTracking = 2;
+        $bibAvailableWidth = $sidebarWidth - 36 - 24;
+        $bibBaseWidth = strlen($registration->registration_code) * (imagefontwidth(5) + $bibTracking);
+        $bibScale = min(1.5, $bibAvailableWidth / $bibBaseWidth);
 
-        imagettftext($image, 15, 0, $nameX, $circleY + 22, $skyBlue, $popSemiBold, $registration->price->period->name);
+        $this->drawTrackedTextScaled(
+            $image, 5, 36, 58, $registration->registration_code, $darkGreenRgb,
+            $this->gradientColorAt(58, $height, $topColor, $bottomColor), $bibTracking, $bibScale
+        );
 
         /*
         |--------------------------------------------------------------------------
-        | GARIS RUTE PUTUS-PUTUS (DEKORASI)
+        | BADGE KATEGORI -- DIPERBESAR HAMPIR SELEBAR SIDEBAR
         |--------------------------------------------------------------------------
         */
 
-        $dashY = 335;
-        $dashX = $contentX;
+        $pillX1 = 36;
+        $pillX2 = $sidebarWidth - 36;
+        $pillY1 = 124;
+        $pillY2 = 214;
 
-        imagefilledrectangle($image, $dashX, $dashY, $dashX + 50, $dashY + 8, $lime);
-        $dashX += 66;
+        $this->drawPill($image, $pillX1, $pillY1, $pillX2, $pillY2, $darkGreen);
 
-        while ($dashX < $contentX + $maxContentWidth) {
-            imagefilledrectangle($image, $dashX, $dashY + 2, $dashX + 20, $dashY + 5, $white);
-            $dashX += 32;
+        $categoryText = $registration->category->name;
+        $categoryScale = 4.2;
+
+        [$catW, $catH] = $this->drawScaledText(
+            $image, 5, 0, 0, $categoryText, $whiteRgb, $darkGreenRgb, $categoryScale, true
+        );
+
+        $this->drawScaledText(
+            $image,
+            5,
+            (int) ($pillX1 + (($pillX2 - $pillX1) - $catW) / 2),
+            (int) ($pillY1 + (($pillY2 - $pillY1) - $catH) / 2),
+            $categoryText,
+            $whiteRgb,
+            $darkGreenRgb,
+            $categoryScale
+        );
+
+        $footerY1 = $height - 54;
+        $footerY2 = $height - 30;
+
+        $this->drawScaledText(
+            $image, 2, 36, $footerY1, 'FARMASI RACE DAY', $darkGreenRgb,
+            $this->gradientColorAt($footerY1, $height, $topColor, $bottomColor), 1.3
+        );
+
+        $this->drawScaledText(
+            $image, 1, 36, $footerY2, 'farmasi.official', $darkGreenRgb,
+            $this->gradientColorAt($footerY2, $height, $topColor, $bottomColor), 1.2
+        );
+
+        /*
+        |--------------------------------------------------------------------------
+        | LUBANG SOBEKAN (PERFORASI) ANTARA SIDEBAR & KONTEN
+        |--------------------------------------------------------------------------
+        */
+
+        for ($y = 24; $y < $height; $y += 36) {
+            imagefilledellipse($image, $sidebarWidth, $y, 22, 22, $bg);
         }
 
         /*
         |--------------------------------------------------------------------------
-        | DETAIL PESERTA (UKURAN BAJU / STATUS)
+        | SISI KANAN -- DETAIL PESERTA
         |--------------------------------------------------------------------------
         */
 
-        $detailY = 385;
+        $contentX = $sidebarWidth + 44;
 
-        $details = array_filter([
-            $registration->shirt_size ? 'UKURAN BAJU: ' . $registration->shirt_size : null,
-            'STATUS: LUNAS',
-        ]);
+        imagestring($image, 3, $contentX, 34, strtoupper($registration->event->name), $amber);
+        imagestring($image, 5, $contentX, 56, $registration->name, $white);
 
-        $detailX = $contentX;
+        $rows = [
+            ['Periode', $registration->price->period->name],
+            ['Ukuran Baju', $registration->shirt_size ?: '-'],
+            ['Status', 'LUNAS'],
+        ];
 
-        foreach ($details as $i => $detail) {
+        $rowY = 118;
+        $rowsRightEdge = $contentX + 420;
 
-            if ($i > 0) {
-                imagettftext($image, 16, 0, $detailX, $detailY, $white, $popRegular, '|');
-                $detailX += 18;
-            }
+        foreach ($rows as [$label, $value]) {
 
-            imagettftext($image, 16, 0, $detailX, $detailY, $white, $popSemiBold, $detail);
-            $detailX += $this->ttfMeasure(16, $popSemiBold, $detail)['width'] + 22;
+            imageline($image, $contentX, $rowY + 16, $rowsRightEdge, $rowY + 16, $line);
+
+            imagestring($image, 3, $contentX, $rowY, $label, $gray);
+
+            $valueWidth = imagefontwidth(3) * strlen($value);
+            imagestring($image, 3, $rowsRightEdge - $valueWidth, $rowY, $value, $lightGray);
+
+            $rowY += 40;
         }
-
-        // Footer kecil.
-        imagettftext($image, 13, 0, $contentX, $height - 35, $white, $popRegular, 'farmasi.official');
 
         /*
         |--------------------------------------------------------------------------
-        | QR CODE VERIFIKASI
+        | QR CODE VERIFIKASI (POJOK KANAN BAWAH)
         |--------------------------------------------------------------------------
         */
 
-        $qrSize = 170;
-        $qrX = $width - $qrSize - 55;
-        $qrY = $height - $qrSize - 55;
-
-        imagettftext($image, 13, 0, $qrX - 4, $qrY - 16, $white, $popSemiBold, 'SCAN VERIFIKASI');
+        $qrSize = 168;
+        $qrX = $width - $qrSize - 50;
+        $qrY = $height - $qrSize - 44;
 
         $verifyUrl = route('fun-run.verify', $registration->registration_code)
             . '?sig=' . $this->ticketSignature($registration);
@@ -1205,8 +1135,34 @@ class FunRunController extends Controller
 
                 imagecopy($image, $qrImage, $qrX, $qrY, 0, 0, $qrSize, $qrSize);
                 imagedestroy($qrImage);
+
+                imagestring(
+                    $image,
+                    2,
+                    $qrX - 12,
+                    $qrY - 34,
+                    'SCAN UNTUK VERIFIKASI',
+                    $gray
+                );
             }
         }
+
+        imagestring(
+            $image,
+            2,
+            $contentX,
+            $qrY + 30,
+            'Tunjukkan tiket ini (cetak atau',
+            $gray
+        );
+        imagestring(
+            $image,
+            2,
+            $contentX,
+            $qrY + 46,
+            'digital) saat pengambilan race pack.',
+            $gray
+        );
 
         ob_start();
         imagepng($image);
@@ -1215,6 +1171,102 @@ class FunRunController extends Controller
         imagedestroy($image);
 
         return $imageData;
+    }
+
+    /**
+     * Hitung warna gradasi sidebar pada posisi Y tertentu -- dipakai
+     * supaya teks yang di-scale-up (lihat drawScaledText) punya
+     * warna latar belakang sementara yang mendekati warna gradasi
+     * asli di baris itu, jadi tidak kelihatan ada kotak solid yang
+     * nyembul pas ditempel ke gambar utama.
+     */
+    private function gradientColorAt(int $y, int $height, array $topColor, array $bottomColor): array
+    {
+        $ratio = max(0, min(1, $y / $height));
+
+        return [
+            (int) ($topColor[0] + ($bottomColor[0] - $topColor[0]) * $ratio),
+            (int) ($topColor[1] + ($bottomColor[1] - $topColor[1]) * $ratio),
+            (int) ($topColor[2] + ($bottomColor[2] - $topColor[2]) * $ratio),
+        ];
+    }
+
+    /**
+     * Gambar teks bitmap GD dalam ukuran yang DIPERBESAR (di-scale
+     * naik beberapa kali dari ukuran font aslinya), supaya lebih
+     * jelas/tidak kekecilan -- font bawaan GD (imagestring) cuma
+     * punya 5 ukuran tetap yang semuanya kecil, jadi ini akal-akalan
+     * bikin versinya lebih besar tanpa perlu file font .ttf.
+     *
+     * Kalau $returnOnly true, tidak digambar ke $image (cuma dipakai
+     * untuk menghitung lebar/tinggi hasil scale, misalnya buat
+     * menengahkan teks di dalam badge sebelum benar-benar digambar).
+     */
+    private function drawScaledText($image, int $font, int $x, int $y, string $text, array $colorRgb, array $bgRgb, float $scale, bool $returnOnly = false): array
+    {
+        $charWidth = imagefontwidth($font);
+        $charHeight = imagefontheight($font);
+        $textWidth = max($charWidth * strlen($text), 1);
+
+        $scaledWidth = (int) round($textWidth * $scale);
+        $scaledHeight = (int) round($charHeight * $scale);
+
+        if ($returnOnly) {
+            return [$scaledWidth, $scaledHeight];
+        }
+
+        $temp = imagecreatetruecolor($textWidth, $charHeight);
+        $tempBg = imagecolorallocate($temp, $bgRgb[0], $bgRgb[1], $bgRgb[2]);
+        $tempColor = imagecolorallocate($temp, $colorRgb[0], $colorRgb[1], $colorRgb[2]);
+        imagefill($temp, 0, 0, $tempBg);
+        imagestring($temp, $font, 0, 0, $text, $tempColor);
+
+        imagecopyresized($image, $temp, $x, $y, 0, 0, $scaledWidth, $scaledHeight, $textWidth, $charHeight);
+        imagedestroy($temp);
+
+        return [$scaledWidth, $scaledHeight];
+    }
+
+    /**
+     * Sama seperti drawScaledText(), tapi hurufnya dikasih spasi
+     * antar-karakter lebih lebar dulu (efek "tracked" ala nomor bib
+     * lari) sebelum di-scale naik.
+     */
+    private function drawTrackedTextScaled($image, int $font, int $x, int $y, string $text, array $colorRgb, array $bgRgb, int $tracking, float $scale): array
+    {
+        $charWidth = imagefontwidth($font);
+        $charHeight = imagefontheight($font);
+        $textWidth = max((strlen($text) * ($charWidth + $tracking)), 1);
+
+        $temp = imagecreatetruecolor($textWidth, $charHeight);
+        $tempBg = imagecolorallocate($temp, $bgRgb[0], $bgRgb[1], $bgRgb[2]);
+        $tempColor = imagecolorallocate($temp, $colorRgb[0], $colorRgb[1], $colorRgb[2]);
+        imagefill($temp, 0, 0, $tempBg);
+
+        for ($i = 0; $i < strlen($text); $i++) {
+            imagechar($temp, $font, $i * ($charWidth + $tracking), 0, $text[$i], $tempColor);
+        }
+
+        $scaledWidth = (int) round($textWidth * $scale);
+        $scaledHeight = (int) round($charHeight * $scale);
+
+        imagecopyresized($image, $temp, $x, $y, 0, 0, $scaledWidth, $scaledHeight, $textWidth, $charHeight);
+        imagedestroy($temp);
+
+        return [$scaledWidth, $scaledHeight];
+    }
+
+    /**
+     * Gambar badge berbentuk pil (rounded pill) sederhana pakai
+     * kombinasi persegi panjang + lingkaran di kedua ujungnya.
+     */
+    private function drawPill($image, int $x1, int $y1, int $x2, int $y2, int $color): void
+    {
+        $radius = $y2 - $y1;
+
+        imagefilledrectangle($image, (int) ($x1 + $radius / 2), $y1, (int) ($x2 - $radius / 2), $y2, $color);
+        imagefilledellipse($image, (int) ($x1 + $radius / 2), (int) (($y1 + $y2) / 2), $radius, $radius, $color);
+        imagefilledellipse($image, (int) ($x2 - $radius / 2), (int) (($y1 + $y2) / 2), $radius, $radius, $color);
     }
 
     /**
