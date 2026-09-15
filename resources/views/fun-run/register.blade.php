@@ -276,7 +276,7 @@
                         <div class="mt-3 overflow-hidden rounded-xl border border-slate-200">
 
                             <img
-                                src="{{ asset('images/fun-run/size-chart2.jpg') }}"
+                                src="{{ asset('images/size-chart2.png') }}"
                                 alt="Contoh ukuran baju S, M, L, XL, 2XL, 3XL"
                                 class="w-full object-contain"
                             >
